@@ -65,16 +65,24 @@ def fetch_conflict_metrics():
                 if found_keywords:
                     keyword_count += len(found_keywords)
                     
-                    # Save a few headlines for contextual analysis (limit to 3 to avoid CSV bloat)
+                    # Save up to 3 unique headlines for context
                     if len(major_headlines) < 3:
-                        # Clean the title of commas and newlines so it doesn't break the CSV format
-                        clean_title = entry.title.replace(",", "").replace("\n", " ").strip()
-                        major_headlines.append(clean_title)
+                        # 1. Strip newlines and extra whitespace
+                        clean_headline = entry.title.strip().replace("\n", " ")
+                        
+                        # 2. Truncate long headlines to keep the CSV tidy
+                        if len(clean_headline) > 100:
+                            clean_headline = clean_headline[:97] + "..."
+                            
+                        # 3. Deduplicate (only add if not already in the list)
+                        if clean_headline not in major_headlines:
+                            major_headlines.append(clean_headline)
+
         except Exception as e:
             print(f"Error parsing feed {url}: {e}")
             
-    # Join headlines into a single string separated by a pipe
-    headlines_summary = " | ".join(major_headlines) if major_headlines else "No major conflict headlines"
+    # Join headlines using a clean delimiter
+    headlines_summary = " ; ".join(major_headlines) if major_headlines else "No major conflict headlines"
     
     return {
         "conflict_keyword_count": keyword_count,
