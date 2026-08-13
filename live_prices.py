@@ -27,15 +27,21 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-# Yahoo Finance tickers for the assets this script tracks
+# Yahoo Finance tickers for the assets this script tracks - same set and
+# column names as tracker.py's 12h feed, so the two stay comparable.
 TICKERS = {
     "gold_usd_oz": "GC=F",
+    "silver_usd_oz": "SI=F",
+    "platinum_usd_oz": "PL=F",
+    "palladium_usd_oz": "PA=F",
+    "copper_usd_lb": "HG=F",
     "brent_oil_usd_bbl": "BZ=F",
+    "wti_oil_usd_bbl": "CL=F",
 }
 
 
 def fetch_live_prices():
-    """Fetches the latest live quote for Gold and Brent Crude via yfinance."""
+    """Fetches the latest live quote for each tracked asset via yfinance."""
     data = {}
     for key, ticker in TICKERS.items():
         try:
@@ -58,7 +64,9 @@ def fetch_live_prices():
 
 
 def init_db(conn):
-    """Creates the live_commodity_prices table if it doesn't already exist."""
+    """Creates the live_commodity_prices table if needed, and migrates it to
+    include any asset columns added to TICKERS since the table was created -
+    existing rows are preserved, new columns default to NULL for them."""
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS live_commodity_prices (
@@ -69,6 +77,12 @@ def init_db(conn):
         )
         """
     )
+
+    existing_columns = {row[1] for row in conn.execute("PRAGMA table_info(live_commodity_prices)")}
+    for column in TICKERS:
+        if column not in existing_columns:
+            conn.execute(f"ALTER TABLE live_commodity_prices ADD COLUMN {column} REAL")
+
     conn.commit()
 
 
@@ -76,12 +90,13 @@ def insert_price_snapshot(conn, price_data):
     """Inserts a timestamped row of live prices into the database."""
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
+    columns = list(TICKERS.keys())
+    placeholders = ", ".join("?" for _ in columns)
+    values = [price_data.get(col) for col in columns]
+
     conn.execute(
-        """
-        INSERT INTO live_commodity_prices (timestamp, gold_usd_oz, brent_oil_usd_bbl)
-        VALUES (?, ?, ?)
-        """,
-        (timestamp, price_data.get("gold_usd_oz"), price_data.get("brent_oil_usd_bbl")),
+        f"INSERT INTO live_commodity_prices (timestamp, {', '.join(columns)}) VALUES (?, {placeholders})",
+        [timestamp, *values],
     )
     conn.commit()
 
@@ -89,7 +104,7 @@ def insert_price_snapshot(conn, price_data):
 
 
 if __name__ == "__main__":
-    log.info("Fetching live Gold and Brent Crude prices...")
+    log.info("Fetching live commodity prices...")
     prices = fetch_live_prices()
 
     with sqlite3.connect(DB_FILE) as conn:
