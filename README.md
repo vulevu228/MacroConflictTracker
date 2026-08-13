@@ -26,7 +26,7 @@ Use the CSV for the broad macro/geopolitical picture and correlation analysis; u
 
 ## 📈 Power BI
 
-See [`POWERBI_SETUP.md`](POWERBI_SETUP.md) for connecting both feeds to a Power BI report (SQLite via ODBC, CSV natively).
+[`connections_relationships_between_commodity_and_live_commodity.pbix`](connections_relationships_between_commodity_and_live_commodity.pbix) — a ready-made Power BI report connecting both feeds (`live_prices.db` via ODBC, `commodity_prices.csv` natively). Open it in Power BI Desktop; since it reads local files, refreshing after a tracker update is `git pull` then Refresh — the committed `.pbix` itself doesn't auto-update just because the underlying data changed on GitHub.
 
 ## 🤖 Planned: AI Insights Layer (not yet active)
 
