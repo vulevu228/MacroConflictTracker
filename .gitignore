@@ -15,3 +15,11 @@ env/
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Local-only run logs (cloud workflow doesn't need these committed)
+live_prices.log
+live_prices_task.log
+
+# Local Windows Task Scheduler helper - superseded by the GitHub Actions
+# cloud schedule, kept out of the public repo since it's machine-specific
+register-live-prices-task.ps1
