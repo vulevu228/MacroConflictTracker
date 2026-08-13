@@ -19,6 +19,7 @@ Thumbs.db
 # Local-only run logs (cloud workflow doesn't need these committed)
 live_prices.log
 live_prices_task.log
+conflict_map_tracker.log
 
 # Local Windows Task Scheduler helper - superseded by the GitHub Actions
 # cloud schedule, kept out of the public repo since it's machine-specific

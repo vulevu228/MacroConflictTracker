@@ -1,0 +1,36 @@
+name: Conflict Hotspot Map Tracker
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  track-conflict-events:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Conflict Map Tracker
+        run: python conflict_map_tracker.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add conflict_events.db
+          git commit -m "data: log GDELT conflict hotspot events" || echo "No changes to commit"
+          git pull --rebase origin main
+          git push origin main
