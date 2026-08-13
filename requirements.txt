@@ -1,5 +1,6 @@
 yfinance
 feedparser
 pandas
+numpy
 matplotlib
 seaborn
