@@ -20,6 +20,7 @@ Thumbs.db
 live_prices.log
 live_prices_task.log
 conflict_map_tracker.log
+forecasting_gold/gold_forecast.log
 
 # Local Windows Task Scheduler helper - superseded by the GitHub Actions
 # cloud schedule, kept out of the public repo since it's machine-specific

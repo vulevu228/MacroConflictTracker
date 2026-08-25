@@ -1,0 +1,38 @@
+name: Gold Price Forecast & Scoreboard
+
+on:
+  schedule:
+    # 23:30 UTC - late enough that live_prices.py's hourly runs have covered
+    # nearly the whole UTC day before it gets resampled into a daily close.
+    - cron: '30 23 * * *'
+  workflow_dispatch:
+
+jobs:
+  forecast-gold:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r forecasting_gold/requirements.txt
+
+      - name: Score yesterday's prediction and forecast tomorrow
+        run: python forecasting_gold/gold_forecast.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add forecasting_gold/predictions.db
+          git commit -m "data: score gold prediction and forecast tomorrow" || echo "No changes to commit"
+          git pull --rebase origin main
+          git push origin main

@@ -42,6 +42,22 @@ Each row is unique per GDELT's own `global_event_id`, so re-running the tracker 
 
 `conflict_events.db` isn't wired into the `.pbix` yet. When it is, add it as a second ODBC DSN (same driver as `live_prices.db`) and use Power BI's Map/bubble-map visual with `lat`/`long` as location, event count or `SUM(ABS(goldstein_scale))` as size, and `hotspot_region` as color/legend.
 
+## 🔮 Gold Price Forecasting (v1)
+
+`forecasting_gold/` is a different kind of piece from the other three feeds above: it doesn't collect anything new, it *consumes* `live_prices.db`'s `gold_usd_oz` series, which needed zero new collection code to exist.
+
+Once a day (`gold_forecast.py`, scheduled 23:30 UTC — late enough that the hourly price feed has covered nearly the full day first):
+1. **Score** — resolves yesterday's prediction against the real closing price that's now available and records the error in `gold_scoreboard`.
+2. **Predict** — forecasts tomorrow's close with two models and records both in `gold_predictions`:
+   - **naive** — tomorrow = today's last price. The floor every real model has to clear.
+   - **prophet** — Facebook/Meta's Prophet, fit fresh each run on the full daily-resampled history.
+
+Both tables live in their own `forecasting_gold/predictions.db`, separate from `live_prices.db`, since the two run on independent schedules (hourly vs. daily) as independent GitHub Actions jobs — a shared file would mean the two writers racing each other.
+
+**Honest expectation-setting:** the dataset started 2026-08-13, so early scoreboard rows are working off well under two weeks of history — a naive guess and Prophet won't be meaningfully different at that scale, and Prophet is not guaranteed to beat the naive baseline at all. That's the actual point of running both: whether Prophet earns its keep over "just guess today's price again" is a real, reportable question the scoreboard exists to answer as history accumulates, not a foregone conclusion.
+
+Daily close = the *last* observed price of the calendar day (UTC), not a daily mean — chosen so "today" stays a single point, which is what keeps the naive baseline's "tomorrow = today" comparison coherent.
+
 ## 🤖 Planned: AI Insights Layer (not yet active)
 
 There's an idea sitting on the shelf for this one: use Claude to write short, plain-English commentary on top of the price and conflict data, and store that commentary in a new `ai_insights.db` right alongside everything else. Nothing's built yet — no code in the pipeline for it — but the shape of it is worked out:
