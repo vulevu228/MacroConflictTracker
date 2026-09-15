@@ -3,5 +3,4 @@ feedparser
 pandas
 numpy
 matplotlib
-seaborn
 requests

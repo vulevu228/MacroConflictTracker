@@ -1,9 +1,20 @@
 # 📈 Global Macro Metals, Energy & Conflict Tracker
 
-A quiet background pipeline that keeps an eye on metals, oil, and geopolitical tension, and turns it into something you can actually look at — a correlation heatmap and a Power BI report, both fed by data that collects itself while you're doing literally anything else.
+A quiet background pipeline that keeps an eye on metals, oil, and geopolitical tension, and turns it into something you can actually look at — a trend chart and a Power BI report, both fed by data that collects itself while you're doing literally anything else.
 
-## 📊 Live Correlation Heatmap
-![Macro Heatmap](heatmap.png)
+## 📊 Live Trend Chart
+![Macro Trend Chart](trend_chart.png)
+
+Every asset indexed to 100 at its first reading, so a 2% move in gold and a
+2% move in oil draw the same visual height instead of gold's ~$4,000 scale
+flattening oil's ~$80 scale into a flat line. The conflict-keyword panel
+below shares the same time axis on purpose - it's there so you can eyeball
+whether a conflict spike lines up with a price move, which is the actual
+question this project exists to answer. (A previous version of this chart
+was a correlation heatmap; replaced because a correlation matrix answers "is
+there a relationship" but not "what actually happened, when" - the trend
+chart answers the second question, which is the one that's actually useful
+at a glance.)
 
 ### Logged Indicators
 * **Safe Havens:** Gold, Silver
@@ -20,7 +31,7 @@ This repo runs three independent, differently-scoped pipelines. They can look re
 | Script | `tracker.py` | `live_prices.py` | `conflict_map_tracker.py` |
 | Cadence | Every 12 hours | Every hour | Every hour |
 | Covers | All 7 assets + geopolitical conflict signal (keyword count) | All 7 assets (no conflict signal) | Geocoded conflict/attack events in named oil-relevant hotspots |
-| Feeds | `generate_heatmap.py` correlation heatmap | — (raw time series) | — (raw time series, for a future map visual) |
+| Feeds | `generate_trend_chart.py` price/conflict trend chart | — (raw time series) | — (raw time series, for a future map visual) |
 
 Use the CSV for the broad macro/geopolitical picture and correlation analysis; use the SQLite dbs for finer-grained hourly history. Don't expect the numbers to line up exactly across feeds at any given moment — they're sampled on different schedules, so a small mismatch between, say, the CSV's gold price and the live tracker's gold price at "the same" hour is expected, not a bug.
 
