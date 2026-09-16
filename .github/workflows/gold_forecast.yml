@@ -7,6 +7,10 @@ on:
     - cron: '30 23 * * *'
   workflow_dispatch:
 
+concurrency:
+  group: gold-forecast-tracker
+  cancel-in-progress: false
+
 jobs:
   forecast-gold:
     runs-on: ubuntu-latest
@@ -34,5 +38,8 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add forecasting_gold/predictions.db
           git commit -m "data: score gold prediction and forecast tomorrow" || echo "No changes to commit"
-          git pull --rebase origin main
-          git push origin main
+          for i in 1 2 3 4 5; do
+            git pull --no-rebase -X ours origin main && git push origin main && break
+            echo "Push attempt $i failed, retrying..."
+            sleep $((RANDOM % 10 + 5))
+          done
