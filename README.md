@@ -68,7 +68,7 @@ Both versions of the report live in [`powerbi/`](powerbi/):
 | File | What it is |
 |---|---|
 | [`MacroConflictTracker_v2_claude_and_mine.pbip`](powerbi/MacroConflictTracker_v2_claude_and_mine.pbip) | The current four-page dashboard shown above, built on top of my first version together with Claude. Open it in Power BI Desktop. |
-| [`MacroConflictTracker_v1_mine.pbix`](powerbi/MacroConflictTracker_v1_mine.pbix) | My original single-page report, built by hand on the shorter data history. Kept for reference. |
+| [`MacroConflictTracker_v1_mine.pbix`](powerbi/MacroConflictTracker_v1_mine.pbix) | My original report, built by hand on the shorter data history. Kept for reference. |
 
 The report reads the local copies of the data, so refreshing after a tracker update is `git pull`, then Refresh. The committed report does not update itself when the data changes on GitHub, which is the one manual step in an otherwise self-running pipeline.
 
