@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "MacroConflictTracker_v2_claude_and_mine"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "4b81122c-30a7-4e9e-bf33-b3dd3067e27b"
+  }
+}

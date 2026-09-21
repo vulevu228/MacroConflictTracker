@@ -1,0 +1,279 @@
+table Calendar
+	lineageTag: 5688752f-af2f-4459-83d9-38dc5616b44f
+
+	measure 'Current Gold Price' =
+			VAR LatestTimeWithData =
+			    CALCULATE(MAX('live_commodity_prices'[timestamp]), NOT ISBLANK('live_commodity_prices'[gold_usd_oz]))
+			RETURN
+			CALCULATE(MAX('live_commodity_prices'[gold_usd_oz]), 'live_commodity_prices'[timestamp] = LatestTimeWithData)
+		formatString: \$#,##0.00
+		lineageTag: 018205a1-3b9e-43e0-a5cc-03d6bd8da9fb
+
+	measure 'Current Silver Price' =
+			VAR LatestTimeWithData =
+			    CALCULATE(MAX('live_commodity_prices'[timestamp]), NOT ISBLANK('live_commodity_prices'[silver_usd_oz]))
+			RETURN
+			CALCULATE(MAX('live_commodity_prices'[silver_usd_oz]), 'live_commodity_prices'[timestamp] = LatestTimeWithData)
+		formatString: \$#,##0.00
+		lineageTag: 14ea2ee8-2614-4f0e-8569-252dd0990ce7
+
+	measure 'Current Platinum Price' =
+			VAR LatestTimeWithData =
+			    CALCULATE(MAX('live_commodity_prices'[timestamp]), NOT ISBLANK('live_commodity_prices'[platinum_usd_oz]))
+			RETURN
+			CALCULATE(MAX('live_commodity_prices'[platinum_usd_oz]), 'live_commodity_prices'[timestamp] = LatestTimeWithData)
+		formatString: \$#,##0.00
+		lineageTag: 20933948-b910-4d39-8e76-f1f6d37d7abb
+
+	measure 'Current Palladium Price' =
+			VAR LatestTimeWithData =
+			    CALCULATE(MAX('live_commodity_prices'[timestamp]), NOT ISBLANK('live_commodity_prices'[palladium_usd_oz]))
+			RETURN
+			CALCULATE(MAX('live_commodity_prices'[palladium_usd_oz]), 'live_commodity_prices'[timestamp] = LatestTimeWithData)
+		formatString: \$#,##0.00
+		lineageTag: 74b298cc-28fc-4747-872f-1d42adb0695a
+
+	measure 'Current Copper Price' =
+			VAR LatestTimeWithData =
+			    CALCULATE(MAX('live_commodity_prices'[timestamp]), NOT ISBLANK('live_commodity_prices'[copper_usd_lb]))
+			RETURN
+			CALCULATE(MAX('live_commodity_prices'[copper_usd_lb]), 'live_commodity_prices'[timestamp] = LatestTimeWithData)
+		formatString: \$#,##0.00
+		lineageTag: 6a6221f5-dd88-465d-98b9-7439ba904c79
+
+	measure 'Current Brent Price' =
+			VAR LatestTimeWithData =
+			    CALCULATE(MAX('live_commodity_prices'[timestamp]), NOT ISBLANK('live_commodity_prices'[brent_oil_usd_bbl]))
+			RETURN
+			CALCULATE(MAX('live_commodity_prices'[brent_oil_usd_bbl]), 'live_commodity_prices'[timestamp] = LatestTimeWithData)
+		formatString: \$#,##0.00
+		lineageTag: 397b3619-6111-4664-9e6a-56d435f41091
+
+	measure 'Current WTI Price' =
+			VAR LatestTimeWithData =
+			    CALCULATE(MAX('live_commodity_prices'[timestamp]), NOT ISBLANK('live_commodity_prices'[wti_oil_usd_bbl]))
+			RETURN
+			CALCULATE(MAX('live_commodity_prices'[wti_oil_usd_bbl]), 'live_commodity_prices'[timestamp] = LatestTimeWithData)
+		formatString: \$#,##0.00
+		lineageTag: a977a58a-bc00-4bc5-9f13-91863f1a84df
+
+	measure 'Total Conflict Keywords' = SUM(commodity_prices[conflict_keyword_count])
+		formatString: #,##0
+		lineageTag: 91f3fdb9-a6fd-4af6-82db-61da491f7a29
+
+	measure 'Gold Avg' = AVERAGE('live_commodity_prices'[gold_usd_oz])
+		formatString: \$#,##0.00
+		lineageTag: c80703d6-450b-5f1d-b9b9-31c97628ab3f
+
+	measure 'Silver Avg' = AVERAGE('live_commodity_prices'[silver_usd_oz])
+		formatString: \$#,##0.00
+		lineageTag: ad541b49-de0c-5766-82e5-4381d08e9ceb
+
+	measure 'Platinum Avg' = AVERAGE('live_commodity_prices'[platinum_usd_oz])
+		formatString: \$#,##0.00
+		lineageTag: eea20e77-a6da-520c-8431-c1e6b74d1a5a
+
+	measure 'Palladium Avg' = AVERAGE('live_commodity_prices'[palladium_usd_oz])
+		formatString: \$#,##0.00
+		lineageTag: 7fcf51ff-c47b-529e-a0f6-a845594e8bb1
+
+	measure 'Copper Avg' = AVERAGE('live_commodity_prices'[copper_usd_lb])
+		formatString: \$#,##0.00
+		lineageTag: 3a728c8c-4c9d-5b5a-b53a-ddc5fd9d89d1
+
+	measure 'Brent Avg' = AVERAGE('live_commodity_prices'[brent_oil_usd_bbl])
+		formatString: \$#,##0.00
+		lineageTag: 2dffa7ab-7ac1-50ac-b397-28a070db1ebe
+
+	measure 'WTI Avg' = AVERAGE('live_commodity_prices'[wti_oil_usd_bbl])
+		formatString: \$#,##0.00
+		lineageTag: e1b13fc8-58ff-5823-9771-b822d34ceca2
+
+	measure 'Gold Delta Text' =
+			VAR LatestT = CALCULATE(MAX('live_commodity_prices'[timestamp]), NOT ISBLANK('live_commodity_prices'[gold_usd_oz]))
+			VAR Latest = CALCULATE(MAX('live_commodity_prices'[gold_usd_oz]), 'live_commodity_prices'[timestamp] = LatestT)
+			VAR PriorT = CALCULATE(MAX('live_commodity_prices'[timestamp]), ALL('Calendar'), 'live_commodity_prices'[timestamp] <= LatestT - 7, NOT ISBLANK('live_commodity_prices'[gold_usd_oz]))
+			VAR Prior = CALCULATE(MAX('live_commodity_prices'[gold_usd_oz]), ALL('Calendar'), 'live_commodity_prices'[timestamp] = PriorT)
+			VAR Chg = DIVIDE(Latest - Prior, Prior)
+			RETURN
+			IF(ISBLANK(Chg), "no 7-day history yet",
+			    IF(Chg >= 0, UNICHAR(9650), UNICHAR(9660)) & " " & FORMAT(ABS(Chg), "0.0%") & " vs 7 days ago")
+		lineageTag: de0049d1-7001-5260-9147-fa3e2fc26b6c
+
+	measure 'Silver Delta Text' =
+			VAR LatestT = CALCULATE(MAX('live_commodity_prices'[timestamp]), NOT ISBLANK('live_commodity_prices'[silver_usd_oz]))
+			VAR Latest = CALCULATE(MAX('live_commodity_prices'[silver_usd_oz]), 'live_commodity_prices'[timestamp] = LatestT)
+			VAR PriorT = CALCULATE(MAX('live_commodity_prices'[timestamp]), ALL('Calendar'), 'live_commodity_prices'[timestamp] <= LatestT - 7, NOT ISBLANK('live_commodity_prices'[silver_usd_oz]))
+			VAR Prior = CALCULATE(MAX('live_commodity_prices'[silver_usd_oz]), ALL('Calendar'), 'live_commodity_prices'[timestamp] = PriorT)
+			VAR Chg = DIVIDE(Latest - Prior, Prior)
+			RETURN
+			IF(ISBLANK(Chg), "no 7-day history yet",
+			    IF(Chg >= 0, UNICHAR(9650), UNICHAR(9660)) & " " & FORMAT(ABS(Chg), "0.0%") & " vs 7 days ago")
+		lineageTag: 86f2affd-67c3-5783-a8c7-8871902da501
+
+	measure 'Platinum Delta Text' =
+			VAR LatestT = CALCULATE(MAX('live_commodity_prices'[timestamp]), NOT ISBLANK('live_commodity_prices'[platinum_usd_oz]))
+			VAR Latest = CALCULATE(MAX('live_commodity_prices'[platinum_usd_oz]), 'live_commodity_prices'[timestamp] = LatestT)
+			VAR PriorT = CALCULATE(MAX('live_commodity_prices'[timestamp]), ALL('Calendar'), 'live_commodity_prices'[timestamp] <= LatestT - 7, NOT ISBLANK('live_commodity_prices'[platinum_usd_oz]))
+			VAR Prior = CALCULATE(MAX('live_commodity_prices'[platinum_usd_oz]), ALL('Calendar'), 'live_commodity_prices'[timestamp] = PriorT)
+			VAR Chg = DIVIDE(Latest - Prior, Prior)
+			RETURN
+			IF(ISBLANK(Chg), "no 7-day history yet",
+			    IF(Chg >= 0, UNICHAR(9650), UNICHAR(9660)) & " " & FORMAT(ABS(Chg), "0.0%") & " vs 7 days ago")
+		lineageTag: 7c86573f-23c2-5831-8f0b-31c402dbe232
+
+	measure 'Palladium Delta Text' =
+			VAR LatestT = CALCULATE(MAX('live_commodity_prices'[timestamp]), NOT ISBLANK('live_commodity_prices'[palladium_usd_oz]))
+			VAR Latest = CALCULATE(MAX('live_commodity_prices'[palladium_usd_oz]), 'live_commodity_prices'[timestamp] = LatestT)
+			VAR PriorT = CALCULATE(MAX('live_commodity_prices'[timestamp]), ALL('Calendar'), 'live_commodity_prices'[timestamp] <= LatestT - 7, NOT ISBLANK('live_commodity_prices'[palladium_usd_oz]))
+			VAR Prior = CALCULATE(MAX('live_commodity_prices'[palladium_usd_oz]), ALL('Calendar'), 'live_commodity_prices'[timestamp] = PriorT)
+			VAR Chg = DIVIDE(Latest - Prior, Prior)
+			RETURN
+			IF(ISBLANK(Chg), "no 7-day history yet",
+			    IF(Chg >= 0, UNICHAR(9650), UNICHAR(9660)) & " " & FORMAT(ABS(Chg), "0.0%") & " vs 7 days ago")
+		lineageTag: 58e83925-7235-5eb2-819e-c5c2be8cd4cd
+
+	measure 'Copper Delta Text' =
+			VAR LatestT = CALCULATE(MAX('live_commodity_prices'[timestamp]), NOT ISBLANK('live_commodity_prices'[copper_usd_lb]))
+			VAR Latest = CALCULATE(MAX('live_commodity_prices'[copper_usd_lb]), 'live_commodity_prices'[timestamp] = LatestT)
+			VAR PriorT = CALCULATE(MAX('live_commodity_prices'[timestamp]), ALL('Calendar'), 'live_commodity_prices'[timestamp] <= LatestT - 7, NOT ISBLANK('live_commodity_prices'[copper_usd_lb]))
+			VAR Prior = CALCULATE(MAX('live_commodity_prices'[copper_usd_lb]), ALL('Calendar'), 'live_commodity_prices'[timestamp] = PriorT)
+			VAR Chg = DIVIDE(Latest - Prior, Prior)
+			RETURN
+			IF(ISBLANK(Chg), "no 7-day history yet",
+			    IF(Chg >= 0, UNICHAR(9650), UNICHAR(9660)) & " " & FORMAT(ABS(Chg), "0.0%") & " vs 7 days ago")
+		lineageTag: 2a8c7b90-283d-5cc3-9156-b6f24ff73c68
+
+	measure 'Brent Delta Text' =
+			VAR LatestT = CALCULATE(MAX('live_commodity_prices'[timestamp]), NOT ISBLANK('live_commodity_prices'[brent_oil_usd_bbl]))
+			VAR Latest = CALCULATE(MAX('live_commodity_prices'[brent_oil_usd_bbl]), 'live_commodity_prices'[timestamp] = LatestT)
+			VAR PriorT = CALCULATE(MAX('live_commodity_prices'[timestamp]), ALL('Calendar'), 'live_commodity_prices'[timestamp] <= LatestT - 7, NOT ISBLANK('live_commodity_prices'[brent_oil_usd_bbl]))
+			VAR Prior = CALCULATE(MAX('live_commodity_prices'[brent_oil_usd_bbl]), ALL('Calendar'), 'live_commodity_prices'[timestamp] = PriorT)
+			VAR Chg = DIVIDE(Latest - Prior, Prior)
+			RETURN
+			IF(ISBLANK(Chg), "no 7-day history yet",
+			    IF(Chg >= 0, UNICHAR(9650), UNICHAR(9660)) & " " & FORMAT(ABS(Chg), "0.0%") & " vs 7 days ago")
+		lineageTag: 0b4883b0-681e-56bf-b5e0-c4d7b0bd4d34
+
+	measure 'WTI Delta Text' =
+			VAR LatestT = CALCULATE(MAX('live_commodity_prices'[timestamp]), NOT ISBLANK('live_commodity_prices'[wti_oil_usd_bbl]))
+			VAR Latest = CALCULATE(MAX('live_commodity_prices'[wti_oil_usd_bbl]), 'live_commodity_prices'[timestamp] = LatestT)
+			VAR PriorT = CALCULATE(MAX('live_commodity_prices'[timestamp]), ALL('Calendar'), 'live_commodity_prices'[timestamp] <= LatestT - 7, NOT ISBLANK('live_commodity_prices'[wti_oil_usd_bbl]))
+			VAR Prior = CALCULATE(MAX('live_commodity_prices'[wti_oil_usd_bbl]), ALL('Calendar'), 'live_commodity_prices'[timestamp] = PriorT)
+			VAR Chg = DIVIDE(Latest - Prior, Prior)
+			RETURN
+			IF(ISBLANK(Chg), "no 7-day history yet",
+			    IF(Chg >= 0, UNICHAR(9650), UNICHAR(9660)) & " " & FORMAT(ABS(Chg), "0.0%") & " vs 7 days ago")
+		lineageTag: 9dd24514-5983-503c-b7fa-64bee1f27ff9
+
+	measure 'Conflict Delta Text' =
+			VAR Days = DISTINCTCOUNT('commodity_prices'[Date])
+			RETURN
+			IF(Days = 0, "no data", "about " & FORMAT(DIVIDE([Total Conflict Keywords], Days), "0.0") & " per day")
+		lineageTag: bf6cbf86-dc11-5604-9c75-18e0db78e5d5
+
+	measure 'Last Price Update' =
+			VAR T = CALCULATE(MAX('live_commodity_prices'[timestamp]), ALL('Calendar'))
+			RETURN
+			FORMAT(T, "d MMM yyyy") & "  ·  " & FORMAT(T, "HH:mm") & " UTC"
+		lineageTag: 61cbeb85-2d20-5f20-a723-ed71bebfd545
+
+	measure 'Conflict Events' = COUNTROWS('conflict_events')
+		formatString: #,##0
+		lineageTag: 2bb89a5e-962b-597e-9868-1e5f0901c8b4
+
+	measure 'Avg Severity' = -AVERAGE('conflict_events'[goldstein_scale])
+		formatString: 0.0
+		lineageTag: f0561793-d6e6-57d1-b841-aa5961e596f0
+
+	measure 'Media Mentions' = SUM('conflict_events'[num_mentions])
+		formatString: #,##0
+		lineageTag: 21ebeda9-1763-5580-b34b-10236dd65fb8
+
+	measure 'Top Hotspot' =
+			VAR T = TOPN(1, VALUES('conflict_events'[hotspot_region]), [Conflict Events], DESC)
+			RETURN
+			IF(ISEMPTY(T), "n/a", MAXX(T, 'conflict_events'[hotspot_region]))
+		lineageTag: 3bc4c576-8af8-5cbd-99dd-763c0d694e74
+
+	measure 'Events Delta Text' =
+			VAR Days = DISTINCTCOUNT('conflict_events'[Date])
+			VAR Regions = DISTINCTCOUNT('conflict_events'[hotspot_region])
+			RETURN
+			IF(Days = 0, "no events in range", "about " & FORMAT(DIVIDE([Conflict Events], Days), "#,##0") & " a day in " & Regions & " hotspot regions")
+		lineageTag: beb9ac96-a429-54ab-80d7-3a9b58e83568
+
+	measure 'Severity Delta Text' = "Goldstein scale, 10 = most severe"
+		lineageTag: 1d5a8055-6ca7-544b-9699-d315a0a269d0
+
+	measure 'Top Hotspot Delta Text' =
+			VAR TopName = [Top Hotspot]
+			RETURN
+			IF(ISBLANK([Conflict Events]), "no events in range", FORMAT(DIVIDE(CALCULATE([Conflict Events], 'conflict_events'[hotspot_region] = TopName), [Conflict Events]), "0%") & " of all events")
+		lineageTag: 18e5b376-35e5-53bc-8beb-dcb9a3d74497
+
+	measure 'Mentions Delta Text' = IF(ISBLANK([Conflict Events]), "no events in range", "about " & FORMAT(DIVIDE([Media Mentions], [Conflict Events]), "0.0") & " mentions per event")
+		lineageTag: 3b551bef-727a-525d-b1b9-fdf7b1e48b48
+
+	measure 'Headline Count' = COUNTROWS('headline_log')
+		formatString: #,##0
+		lineageTag: 7d0399d0-c833-56da-9e4e-b8c346115a2f
+
+	measure 'Gold Avg on keyword days' = IF(ISBLANK([Total Conflict Keywords]), BLANK(), [Gold Avg])
+		formatString: \$#,##0.00
+		lineageTag: 1df9dbc2-43fd-5f32-8b90-af8add713cbc
+
+	measure 'Silver Avg on keyword days' = IF(ISBLANK([Total Conflict Keywords]), BLANK(), [Silver Avg])
+		formatString: \$#,##0.00
+		lineageTag: b4cd4be7-dc45-5ae0-b0c3-682dec775d4d
+
+	measure 'Platinum Avg on keyword days' = IF(ISBLANK([Total Conflict Keywords]), BLANK(), [Platinum Avg])
+		formatString: \$#,##0.00
+		lineageTag: be73c595-81ad-55e1-97a4-d1136385a873
+
+	measure 'Palladium Avg on keyword days' = IF(ISBLANK([Total Conflict Keywords]), BLANK(), [Palladium Avg])
+		formatString: \$#,##0.00
+		lineageTag: b82ad4d9-4cda-58dd-9559-1c000a7d5a47
+
+	measure 'Copper Avg on keyword days' = IF(ISBLANK([Total Conflict Keywords]), BLANK(), [Copper Avg])
+		formatString: \$#,##0.00
+		lineageTag: 72174ea0-f2bd-5c8e-91a0-93af81576c2e
+
+	measure 'Brent Avg on event days' = IF(ISBLANK([Conflict Events]), BLANK(), [Brent Avg])
+		formatString: \$#,##0.00
+		lineageTag: e259d155-5a8f-55f9-8a8e-713621dac8f8
+
+	measure 'Brent Avg on keyword days' = IF(ISBLANK([Total Conflict Keywords]), BLANK(), [Brent Avg])
+		formatString: \$#,##0.00
+		lineageTag: ce3169da-b733-5e19-b9a5-dd57c1eed524
+
+	measure 'WTI Avg on event days' = IF(ISBLANK([Conflict Events]), BLANK(), [WTI Avg])
+		formatString: \$#,##0.00
+		lineageTag: 363fc1e0-43bd-5907-882d-e6223fd9d074
+
+	column Date
+		formatString: General Date
+		lineageTag: 7240c199-a9ba-4f40-8b73-f5fd7c9a326c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		variation Variation
+			isDefault
+			relationship: 53513137-8b6d-4ce5-aac9-cb91951ac945
+			defaultHierarchy: LocalDateTable_e55ebe35-8912-420d-a18c-b5ac272338bf.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Calendar = calculated
+		mode: import
+		source = ```
+				
+				VAR MinDate = MIN(MIN('commodity_prices'[timestamp]), MIN('live_commodity_prices'[timestamp]))
+				VAR MaxDate = MAX(MAX('commodity_prices'[timestamp]), MAX('live_commodity_prices'[timestamp]))
+				RETURN
+				CALENDAR(DATEVALUE(MinDate), DATEVALUE(MaxDate)) 
+				```
+
+	annotation PBI_Id = 16f586667ab04dc7815121c85222794c
+

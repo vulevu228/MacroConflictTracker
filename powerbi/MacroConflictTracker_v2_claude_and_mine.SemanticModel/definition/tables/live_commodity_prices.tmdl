@@ -1,0 +1,129 @@
+table live_commodity_prices
+	lineageTag: c396249b-dc8f-4698-aa7a-6ac13730f7c6
+
+	column id
+		dataType: double
+		lineageTag: c3ff9152-4816-4338-a11a-f81a05dc10f7
+		summarizeBy: sum
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column timestamp
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1089fd6f-6cbf-478c-bbda-2e43382fd31e
+		summarizeBy: none
+		sourceColumn: timestamp
+
+		variation Variation
+			isDefault
+			relationship: 1f170a41-e55c-4d49-a670-5156575c87da
+			defaultHierarchy: LocalDateTable_222a9c57-ec99-4191-8394-916d03dc0630.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column gold_usd_oz
+		dataType: double
+		lineageTag: 12b1316b-7a1e-4a65-ab59-ee7b46e4476f
+		summarizeBy: sum
+		sourceColumn: gold_usd_oz
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column brent_oil_usd_bbl
+		dataType: double
+		lineageTag: 08a427d2-dc30-47a5-8e22-61da4b2e0979
+		summarizeBy: sum
+		sourceColumn: brent_oil_usd_bbl
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column silver_usd_oz
+		dataType: double
+		lineageTag: b01ffbef-61bd-4e15-a57d-86250edc7058
+		summarizeBy: sum
+		sourceColumn: silver_usd_oz
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column platinum_usd_oz
+		dataType: double
+		lineageTag: 1d1a5b9e-6dfc-4c15-abb5-e599a0e6a8a2
+		summarizeBy: sum
+		sourceColumn: platinum_usd_oz
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column palladium_usd_oz
+		dataType: double
+		lineageTag: d8c7f583-2855-4d07-9acf-8e4eff34cee4
+		summarizeBy: sum
+		sourceColumn: palladium_usd_oz
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column copper_usd_lb
+		dataType: double
+		lineageTag: fccbfa15-c4c9-4712-ab48-f3da4037d367
+		summarizeBy: sum
+		sourceColumn: copper_usd_lb
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column wti_oil_usd_bbl
+		dataType: double
+		lineageTag: abdaeff8-f315-4537-9b86-570711b367b1
+		summarizeBy: sum
+		sourceColumn: wti_oil_usd_bbl
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 3d0e710a-8f41-4958-81e7-cecfb1de8377
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition live_commodity_prices = m
+		mode: import
+		source =
+				let
+				    Source = Odbc.DataSource("dsn=tracking_metals_live", [HierarchicalNavigation=true]),
+				    live_commodity_prices_Table = Source{[Name="live_commodity_prices",Kind="Table"]}[Data],
+				    #"Filtered Rows" = Table.SelectRows(live_commodity_prices_Table, each true),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Filtered Rows",{{"timestamp", type datetime}}),
+				    // hourly back-fill 2 Feb - 13 Aug 2026 (history/price_history.csv), stops where the live tracker starts
+				    HistoryCsv = Csv.Document(File.Contents("C:\Users\emira\Projects\GitHub-Projects\MacroConflictTracker\history\price_history.csv"),[Delimiter=",", Columns=8, QuoteStyle=QuoteStyle.Csv]),
+				    HistoryPromoted = Table.PromoteHeaders(HistoryCsv, [PromoteAllScalars = true]),
+				    HistoryTyped = Table.TransformColumnTypes(HistoryPromoted, {{"timestamp", type datetime}, {"gold_usd_oz", type number}, {"silver_usd_oz", type number}, {"platinum_usd_oz", type number}, {"palladium_usd_oz", type number}, {"copper_usd_lb", type number}, {"brent_oil_usd_bbl", type number}, {"wti_oil_usd_bbl", type number}}, "en-US"),
+				    Combined = Table.Combine({HistoryTyped, #"Changed Type"}),
+				    #"Inserted Date" = Table.AddColumn(Combined, "Date", each DateTime.Date([timestamp]), type date)
+				in
+				    #"Inserted Date"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -6,10 +6,12 @@ A quiet background pipeline that keeps an eye on metals, oil, and geopolitical t
 
 A four-page Power BI report over all three feeds. Every page shares one date-range filter, and the tabs at the top (or the **NEXT** button at the foot of each page) walk through the story in order.
 
+> **Data coverage.** The war began on 28 February 2026, but this tracker only started collecting on 12 August. To give the price charts a "before" picture, **prices were back-filled** from Yahoo Finance's hourly history to 2 February 2026 (`backfill_price_history.py` writes `history/price_history.csv`, a one-off file that no GitHub Action touches). Everything else (keyword counts, headlines, conflict events) is only what the tracker itself recorded since 12 August; it was not back-filled.
+
 ### 1 · Market Overview
 ![Market Overview: live price cards, six trend charts and daily conflict keywords](images/dashboard-1-market-overview.png)
 
-Seven live price cards (gold, silver, platinum, palladium, copper, Brent, WTI) each showing the latest reading and its change against seven days earlier, then six trend charts. Metals and oil trade at very different price levels, so every chart keeps **one axis and its own scale**; platinum with palladium and Brent with WTI share a chart only because their prices are close enough to sit on the same scale. The last chart counts conflict keywords per day.
+Seven live price cards (gold, silver, platinum, palladium, copper, Brent, WTI) each showing the latest reading and its change against seven days earlier, then six trend charts that run from 2 February, so the weeks before and after 28 February are on screen. Metals and oil trade at very different price levels, so every chart keeps **one axis and its own scale**; platinum with palladium and Brent with WTI share a chart only because their prices are close enough to sit on the same scale. The last chart counts conflict keywords per day.
 
 ### 2 · Trend Lines
 ![Trend Lines: conflict keywords against average price, one dot per day](images/dashboard-2-trend-lines.png)
@@ -43,6 +45,8 @@ This repo runs three independent, differently-scoped pipelines. They can look re
 | Covers | All 7 assets + geopolitical conflict signal (keyword count) | All 7 assets (no conflict signal) | Geocoded conflict/attack events in named oil-relevant hotspots |
 | Feeds | Market Overview, Trend Lines and Headline Wire pages | Market Overview price cards and charts | Geopolitical Feed map and event charts |
 
+**Back-filled history:** `history/price_history.csv` holds hourly prices for the same seven assets from 2 Feb to 13 Aug 2026, made once by `backfill_price_history.py` (same Yahoo Finance tickers as `tracker.py`) so the charts cover the weeks before the war too. The Power BI price table joins it to `live_prices.db`; nothing else was back-filled.
+
 Use the CSV for the broad macro/geopolitical picture and correlation analysis; use the SQLite dbs for finer-grained hourly history. Don't expect the numbers to line up exactly across feeds at any given moment — they're sampled on different schedules, so a small mismatch between, say, the CSV's gold price and the live tracker's gold price at "the same" hour is expected, not a bug.
 
 ### Conflict hotspot map (`conflict_events.db`)
@@ -59,14 +63,19 @@ Each row is unique per GDELT's own `global_event_id`, so re-running the tracker 
 
 ## 📈 Power BI
 
-The dashboard is a Power BI project (PBIP) in [`powerbi/`](powerbi/): open [`powerbi/connections_relationships_between_commodity_and_live_commodity.pbip`](powerbi/connections_relationships_between_commodity_and_live_commodity.pbip) in Power BI Desktop. It reads the local copies of the data, so refreshing after a tracker update is `git pull`, then Refresh. The committed report does not update itself when the data changes on GitHub, which is the one manual step in an otherwise self-running pipeline.
+Both versions of the report live in [`powerbi/`](powerbi/):
 
-**One-time setup on a new machine**
+| File | What it is |
+|---|---|
+| [`MacroConflictTracker_v2_claude_and_mine.pbip`](powerbi/MacroConflictTracker_v2_claude_and_mine.pbip) | The current four-page dashboard shown above, built on top of my first version together with Claude. Open it in Power BI Desktop. |
+| [`MacroConflictTracker_v1_mine.pbix`](powerbi/MacroConflictTracker_v1_mine.pbix) | My original single-page report, built by hand on the shorter data history. Kept for reference. |
+
+The report reads the local copies of the data, so refreshing after a tracker update is `git pull`, then Refresh. The committed report does not update itself when the data changes on GitHub, which is the one manual step in an otherwise self-running pipeline.
+
+**One-time setup on a new machine (v2)**
 1. Install a 64-bit SQLite ODBC driver and create two **User DSNs** with these exact names: `tracking_metals_live` pointing at `live_prices.db`, and `conflict_events_live` pointing at `conflict_events.db`.
-2. The `commodity_prices` and `headline_log` queries read `commodity_prices.csv` from an absolute path. Change the `File.Contents(...)` path in both to your clone (Transform data, then Advanced Editor).
-3. Refresh.
-
-The original single-page `.pbix` from the first version of this project is still in the repo root for reference; the `.pbip` above replaces it.
+2. Three queries read CSV files from an absolute path: `commodity_prices` and `headline_log` (`commodity_prices.csv`) and `live_commodity_prices` (`history/price_history.csv`). Change the `File.Contents(...)` path in each to your clone (Transform data, then Advanced Editor).
+3. Refresh. The price table combines a database and a CSV, so Power BI asks for privacy levels the first time: choose **Organizational** for both sources.
 
 ## 🔮 Gold Price Forecasting (v1)
 

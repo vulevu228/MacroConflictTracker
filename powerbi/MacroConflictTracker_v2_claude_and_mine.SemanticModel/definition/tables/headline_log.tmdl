@@ -1,0 +1,72 @@
+table headline_log
+	lineageTag: 6163701c-1f16-5f9b-bab4-74b7f02fe64f
+
+	column headline
+		dataType: string
+		lineageTag: abb92f25-0601-5408-affc-d66604df2219
+		summarizeBy: none
+		sourceColumn: headline
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_seen
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 79071950-b81f-59c1-81c9-ceb916b4821c
+		summarizeBy: none
+		sourceColumn: first_seen
+
+		annotation SummarizationSetBy = Automatic
+
+	column seen_in_runs
+		dataType: int64
+		formatString: 0
+		lineageTag: f6ff462b-c0cf-515d-830c-0e323778aff3
+		summarizeBy: none
+		sourceColumn: seen_in_runs
+
+		annotation SummarizationSetBy = Automatic
+
+	column theme
+		dataType: string
+		lineageTag: f3b2e95e-5429-5e4e-849a-8734776bbdfd
+		summarizeBy: none
+		sourceColumn: theme
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 6de1df13-1854-55bc-ae19-56862c0c3be7
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition headline_log = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\emira\Projects\GitHub-Projects\MacroConflictTracker\commodity_prices.csv"),[Delimiter=",", Columns=10, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    #"Kept columns" = Table.SelectColumns(#"Promoted headers", {"timestamp", "headlines_summary"}),
+				    #"Changed type" = Table.TransformColumnTypes(#"Kept columns", {{"timestamp", type datetime}, {"headlines_summary", type text}}, "en-US"),
+				    #"Split headlines" = Table.TransformColumns(#"Changed type", {{"headlines_summary", each Text.Split(Text.Replace(_, " | ", " ; "), " ; "), type list}}),
+				    #"One row per headline" = Table.ExpandListColumn(#"Split headlines", "headlines_summary"),
+				    #"Renamed" = Table.RenameColumns(#"One row per headline", {{"headlines_summary", "headline"}}),
+				    #"Trimmed" = Table.TransformColumns(#"Renamed", {{"headline", each Text.Trim(_), type text}}),
+				    #"Real headlines" = Table.SelectRows(#"Trimmed", each [headline] <> "" and [headline] <> "No major conflict headlines"),
+				    #"Unique headlines" = Table.Group(#"Real headlines", {"headline"}, {{"first_seen", each List.Min([timestamp]), type datetime}, {"seen_in_runs", each Table.RowCount(_), Int64.Type}}),
+				    // topic = first rule whose keywords appear in the headline (a guide, not a classification)
+				    Rules = {{"Iran & Gulf", {"iran", "tehran", "hormuz", "gulf", "saudi", "houthi", "yemen", "red sea", "oman", "kuwait", "bahrain", "qatar", "emirates", " uae "}}, {"Russia & Ukraine", {"russia", "ukrain", "putin", "kyiv", "moscow", "kremlin", "zelensk"}}, {"Israel & Levant", {"israel", "gaza", "hamas", "hezbollah", "lebanon", "syria", "iraq", "palestin", "west bank", "jerusalem"}}, {"China & Asia", {"china", "taiwan", "beijing", "korea", "india", "pakistan", "afghan", "japan", "myanmar", "philippin", "thailand"}}, {"Africa", {"africa", "sudan", "congo", "nigeria", "sahel", "ethiopia", "somalia", "libya", "kenya"}}, {"Economy", {" oil", "sanction", "tariff", "econom", "inflation", "petrol", " gas ", "fuel", "energy", " trade ", " market"}}, {"US & Europe", {"trump", "biden", "nato", " us ", "white house", "pentagon", "congress", "europe", " eu ", "germany", "france", " uk ", "britain", "spain", "spanish", "macron", "election", "minister", " pm "}}},
+				    ThemeOf = (h as text) as text => let l = " " & Text.Lower(h) & " ", hit = List.First(List.Select(Rules, (r) => List.AnyTrue(List.Transform(r{1}, (k) => Text.Contains(l, k)))), null) in if hit = null then "Other world news" else hit{0},
+				    #"Added topic" = Table.AddColumn(#"Unique headlines", "theme", each ThemeOf([headline]), type text),
+				    #"Added Date" = Table.AddColumn(#"Added topic", "Date", each DateTime.Date([first_seen]), type date)
+				in
+				    #"Added Date"
+
+	annotation PBI_ResultType = Table
+
