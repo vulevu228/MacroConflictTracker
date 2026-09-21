@@ -1,0 +1,31 @@
+relationship 1f170a41-e55c-4d49-a670-5156575c87da
+	joinOnDateBehavior: datePartOnly
+	fromColumn: live_commodity_prices.timestamp
+	toColumn: LocalDateTable_222a9c57-ec99-4191-8394-916d03dc0630.Date
+
+relationship e62d9c4e-0a23-4ec0-b1bd-20c10f856178
+	joinOnDateBehavior: datePartOnly
+	fromColumn: commodity_prices.timestamp
+	toColumn: LocalDateTable_32bca800-81ec-4669-ad5c-5cb36a9c58d9.Date
+
+relationship 53513137-8b6d-4ce5-aac9-cb91951ac945
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Calendar.Date
+	toColumn: LocalDateTable_e55ebe35-8912-420d-a18c-b5ac272338bf.Date
+
+relationship 24cf7c21-cecb-327b-6d71-c204cb841e04
+	fromColumn: live_commodity_prices.Date
+	toColumn: Calendar.Date
+
+relationship 7f50916f-8e3e-0070-a1d7-b36602e7ffb5
+	fromColumn: commodity_prices.Date
+	toColumn: Calendar.Date
+
+relationship e28c3725-3242-502e-8e1f-c1284b020183
+	fromColumn: conflict_events.Date
+	toColumn: Calendar.Date
+
+relationship 6c021ab3-377e-5f2d-9495-c601493f2c14
+	fromColumn: headline_log.Date
+	toColumn: Calendar.Date
+

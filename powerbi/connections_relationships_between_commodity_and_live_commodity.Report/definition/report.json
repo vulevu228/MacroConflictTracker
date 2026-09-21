@@ -1,0 +1,224 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.3.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "CY26SU07",
+      "reportVersionAtImport": {
+        "visual": "2.11.0",
+        "report": "3.4.0",
+        "page": "2.3.1"
+      },
+      "type": "SharedResources"
+    }
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "resourcePackages": [
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "CY26SU07",
+          "path": "BaseThemes/CY26SU07.json",
+          "type": "BaseTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "bg_market1101.jpg",
+          "path": "bg_market1101.jpg",
+          "type": "Image"
+        },
+        {
+          "name": "rule_gold9140.png",
+          "path": "rule_gold9140.png",
+          "type": "Image"
+        },
+        {
+          "name": "icon_gold7285.png",
+          "path": "icon_gold7285.png",
+          "type": "Image"
+        },
+        {
+          "name": "hero_market7263.png",
+          "path": "hero_market7263.png",
+          "type": "Image"
+        },
+        {
+          "name": "strip_gold_2162580.png",
+          "path": "strip_gold_2162580.png",
+          "type": "Image"
+        },
+        {
+          "name": "icon_silver1612.png",
+          "path": "icon_silver1612.png",
+          "type": "Image"
+        },
+        {
+          "name": "strip_silver_2169275.png",
+          "path": "strip_silver_2169275.png",
+          "type": "Image"
+        },
+        {
+          "name": "icon_platinum6531.png",
+          "path": "icon_platinum6531.png",
+          "type": "Image"
+        },
+        {
+          "name": "strip_platinum_2161605.png",
+          "path": "strip_platinum_2161605.png",
+          "type": "Image"
+        },
+        {
+          "name": "icon_palladium9184.png",
+          "path": "icon_palladium9184.png",
+          "type": "Image"
+        },
+        {
+          "name": "strip_palladium_2166762.png",
+          "path": "strip_palladium_2166762.png",
+          "type": "Image"
+        },
+        {
+          "name": "icon_copper1872.png",
+          "path": "icon_copper1872.png",
+          "type": "Image"
+        },
+        {
+          "name": "strip_copper_2163179.png",
+          "path": "strip_copper_2163179.png",
+          "type": "Image"
+        },
+        {
+          "name": "icon_brent9731.png",
+          "path": "icon_brent9731.png",
+          "type": "Image"
+        },
+        {
+          "name": "strip_brent_2167250.png",
+          "path": "strip_brent_2167250.png",
+          "type": "Image"
+        },
+        {
+          "name": "icon_wti9823.png",
+          "path": "icon_wti9823.png",
+          "type": "Image"
+        },
+        {
+          "name": "strip_wti_2169743.png",
+          "path": "strip_wti_2169743.png",
+          "type": "Image"
+        },
+        {
+          "name": "icon_conflict6930.png",
+          "path": "icon_conflict6930.png",
+          "type": "Image"
+        },
+        {
+          "name": "strip_conflict_2169163.png",
+          "path": "strip_conflict_2169163.png",
+          "type": "Image"
+        },
+        {
+          "name": "bg_short7169.jpg",
+          "path": "bg_short7169.jpg",
+          "type": "Image"
+        },
+        {
+          "name": "hero_trend1182.png",
+          "path": "hero_trend1182.png",
+          "type": "Image"
+        },
+        {
+          "name": "bg_hotspots5603.jpg",
+          "path": "bg_hotspots5603.jpg",
+          "type": "Image"
+        },
+        {
+          "name": "hero_hotspots2347.png",
+          "path": "hero_hotspots2347.png",
+          "type": "Image"
+        },
+        {
+          "name": "strip_conflict_4487392.png",
+          "path": "strip_conflict_4487392.png",
+          "type": "Image"
+        },
+        {
+          "name": "icon_severity4870.png",
+          "path": "icon_severity4870.png",
+          "type": "Image"
+        },
+        {
+          "name": "strip_severity_4489201.png",
+          "path": "strip_severity_4489201.png",
+          "type": "Image"
+        },
+        {
+          "name": "icon_hotspot6255.png",
+          "path": "icon_hotspot6255.png",
+          "type": "Image"
+        },
+        {
+          "name": "strip_hotspot_4484558.png",
+          "path": "strip_hotspot_4484558.png",
+          "type": "Image"
+        },
+        {
+          "name": "icon_mentions8305.png",
+          "path": "icon_mentions8305.png",
+          "type": "Image"
+        },
+        {
+          "name": "strip_mentions_4483745.png",
+          "path": "strip_mentions_4483745.png",
+          "type": "Image"
+        },
+        {
+          "name": "hero_feed4854.png",
+          "path": "hero_feed4854.png",
+          "type": "Image"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": true,
+    "useDefaultAggregateDisplayName": true
+  }
+}

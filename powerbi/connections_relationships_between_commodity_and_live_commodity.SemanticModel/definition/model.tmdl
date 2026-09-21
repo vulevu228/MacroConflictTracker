@@ -1,0 +1,27 @@
+model Model
+	culture: en-GB
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-GB
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["commodity_prices","live_commodity_prices","conflict_events","headline_log"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table commodity_prices
+ref table DateTableTemplate_a072d654-3170-4e94-8339-8ee701008b3f
+ref table live_commodity_prices
+ref table Calendar
+ref table headline_log
+ref table conflict_events
+ref table LocalDateTable_222a9c57-ec99-4191-8394-916d03dc0630
+ref table LocalDateTable_32bca800-81ec-4669-ad5c-5cb36a9c58d9
+ref table LocalDateTable_e55ebe35-8912-420d-a18c-b5ac272338bf
+
+ref cultureInfo en-GB
+

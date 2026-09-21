@@ -1,0 +1,130 @@
+table commodity_prices
+	lineageTag: a40f53e1-892d-42c4-b88e-d98b3e70e1a7
+
+	column timestamp
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 9e9d578e-ac35-41b3-9365-0afb4034a69b
+		summarizeBy: none
+		sourceColumn: timestamp
+
+		variation Variation
+			isDefault
+			relationship: e62d9c4e-0a23-4ec0-b1bd-20c10f856178
+			defaultHierarchy: LocalDateTable_32bca800-81ec-4669-ad5c-5cb36a9c58d9.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column gold_usd_oz
+		dataType: double
+		lineageTag: 20d01f80-8cd1-48d0-8b7a-a91879403c7d
+		summarizeBy: sum
+		sourceColumn: gold_usd_oz
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column silver_usd_oz
+		dataType: double
+		lineageTag: 822eee69-5218-4a21-8301-02c0df8189ab
+		summarizeBy: sum
+		sourceColumn: silver_usd_oz
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column platinum_usd_oz
+		dataType: double
+		lineageTag: 6a406f3e-5a16-4887-98c0-aad81d42e984
+		summarizeBy: sum
+		sourceColumn: platinum_usd_oz
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column palladium_usd_oz
+		dataType: double
+		lineageTag: abf1a4bf-1e76-40ce-a197-c4431f3a96db
+		summarizeBy: sum
+		sourceColumn: palladium_usd_oz
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column copper_usd_lb
+		dataType: double
+		lineageTag: fb49bffc-f51e-4bc3-a5ff-1ba93d2738b4
+		summarizeBy: sum
+		sourceColumn: copper_usd_lb
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column brent_oil_usd_bbl
+		dataType: double
+		lineageTag: aef6e856-9008-4454-b194-f6f851819fb0
+		summarizeBy: sum
+		sourceColumn: brent_oil_usd_bbl
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column wti_oil_usd_bbl
+		dataType: double
+		lineageTag: 0e5470ce-f64e-4478-a296-bb7063ab9809
+		summarizeBy: sum
+		sourceColumn: wti_oil_usd_bbl
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column conflict_keyword_count
+		dataType: int64
+		formatString: 0
+		lineageTag: e7e4bf9e-b48d-46db-86d9-4379d1a2b3d9
+		summarizeBy: sum
+		sourceColumn: conflict_keyword_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column headlines_summary
+		dataType: string
+		lineageTag: 81126d11-6e1a-48f5-aa9e-21b49763b112
+		summarizeBy: none
+		sourceColumn: headlines_summary
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 440710b2-e197-465b-96f2-344e90aceaab
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition commodity_prices = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents("C:\Users\emira\Projects\GitHub-Projects\MacroConflictTracker\commodity_prices.csv"),[Delimiter=",", Columns=10, QuoteStyle=QuoteStyle.Csv]),
+				  #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Promoted headers", {{"timestamp", type datetime}, {"gold_usd_oz", type number}, {"silver_usd_oz", type number}, {"platinum_usd_oz", type number}, {"palladium_usd_oz", type number}, {"copper_usd_lb", type number}, {"brent_oil_usd_bbl", type number}, {"wti_oil_usd_bbl", type number}, {"conflict_keyword_count", Int64.Type}, {"headlines_summary", type text}}, "en-US"),
+				    #"Inserted Date" = Table.AddColumn(#"Changed column type", "Date", each DateTime.Date([timestamp]), type date)
+				in
+				  #"Inserted Date"
+
+	annotation PBI_ResultType = Exception
+
+	annotation PBI_NavigationStepName = Navigation
+

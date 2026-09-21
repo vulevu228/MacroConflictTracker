@@ -1,22 +1,32 @@
 # 📈 Global Macro Metals, Energy & Conflict Tracker
 
-A quiet background pipeline that keeps an eye on metals, oil, and geopolitical tension, and turns it into something you can actually look at — a trend chart and a Power BI report, both fed by data that collects itself while you're doing literally anything else.
+A quiet background pipeline that keeps an eye on metals, oil, and geopolitical tension, and turns it into something you can actually look at — a four-page Power BI dashboard fed by data that collects itself while you're doing literally anything else.
 
-## 📊 Live Trend Chart
-![Macro Trend Chart](trend_chart.png)
+## 📊 The Dashboard
 
-Every asset indexed to 100 at its first reading, so a 2% move in gold and a
-2% move in oil draw the same visual height instead of gold's ~$4,000 scale
-flattening oil's ~$80 scale into a flat line. The conflict-keyword panel
-below shares the same time axis on purpose - it's there so you can eyeball
-whether a conflict spike lines up with a price move, which is the actual
-question this project exists to answer. (A previous version of this chart
-was a correlation heatmap; replaced because a correlation matrix answers "is
-there a relationship" but not "what actually happened, when" - the trend
-chart answers the second question, which is the one that's actually useful
-at a glance.)
+A four-page Power BI report over all three feeds. Every page shares one date-range filter, and the tabs at the top (or the **NEXT** button at the foot of each page) walk through the story in order.
 
-### Logged Indicators
+### 1 · Market Overview
+![Market Overview: live price cards, six trend charts and daily conflict keywords](images/dashboard-1-market-overview.png)
+
+Seven live price cards (gold, silver, platinum, palladium, copper, Brent, WTI) each showing the latest reading and its change against seven days earlier, then six trend charts. Metals and oil trade at very different price levels, so every chart keeps **one axis and its own scale**; platinum with palladium and Brent with WTI share a chart only because their prices are close enough to sit on the same scale. The last chart counts conflict keywords per day.
+
+### 2 · Trend Lines
+![Trend Lines: conflict keywords against average price, one dot per day](images/dashboard-2-trend-lines.png)
+
+The question this project exists to ask: do days with more conflict language in the headlines look different in the market? One dot per day, conflict-keyword count on the x-axis, average price on the y-axis, with a linear trend line. A trend line shows a pattern, not a cause.
+
+### 3 · Geopolitical Feed
+![Geopolitical Feed: conflict-event map, hotspot bars and events per day set beside the oil price](images/dashboard-3-geopolitical-feed.png)
+
+Geocoded conflict events from GDELT inside the oil-relevant hotspots (Iran, Yemen, the Red Sea, Oman, the Strait of Hormuz): a bubble map, events by region and by type, and events per day stacked directly above the daily Brent and WTI prices on the same date axis so the two can be compared by eye. See [the conflict hotspot map](#conflict-hotspot-map-conflict_eventsdb) below for how the events are selected and where they can mislead.
+
+### 4 · Headline Wire
+![Headline Wire: the BBC and Al Jazeera headlines behind the keyword count, grouped by topic](images/dashboard-4-headline-wire.png)
+
+The headlines behind the keyword count, one per row, with the date each first appeared and how many runs it stayed on the feed. Topics are assigned by keyword rules inside the Power BI model (first match wins, everything else is "Other world news"), so read them as a guide rather than a classification.
+
+## 🧾 Logged Indicators
 * **Safe Havens:** Gold, Silver
 * **Industrial Metals:** Platinum, Palladium, Copper
 * **Energy:** Brent Crude, WTI Crude
@@ -31,7 +41,7 @@ This repo runs three independent, differently-scoped pipelines. They can look re
 | Script | `tracker.py` | `live_prices.py` | `conflict_map_tracker.py` |
 | Cadence | Every 12 hours | Every hour | Every hour |
 | Covers | All 7 assets + geopolitical conflict signal (keyword count) | All 7 assets (no conflict signal) | Geocoded conflict/attack events in named oil-relevant hotspots |
-| Feeds | `generate_trend_chart.py` price/conflict trend chart | — (raw time series) | — (raw time series, for a future map visual) |
+| Feeds | Market Overview, Trend Lines and Headline Wire pages | Market Overview price cards and charts | Geopolitical Feed map and event charts |
 
 Use the CSV for the broad macro/geopolitical picture and correlation analysis; use the SQLite dbs for finer-grained hourly history. Don't expect the numbers to line up exactly across feeds at any given moment — they're sampled on different schedules, so a small mismatch between, say, the CSV's gold price and the live tracker's gold price at "the same" hour is expected, not a bug.
 
@@ -45,13 +55,18 @@ This was chosen over extracting locations from the existing RSS conflict-keyword
 
 Each row is unique per GDELT's own `global_event_id`, so re-running the tracker (or its 15-minute fetch windows overlapping across hourly runs) never creates duplicates — safe to re-run as often as you like.
 
-**Not yet built:** the actual price-correlation analysis — does gold actually rise, does oil actually spike, when a hotspot event happens? That's the interesting question this feed exists to eventually answer, but it needs real history to accumulate first, same as the other two feeds.
+**Not yet built:** a statistical test of the price question — does gold actually rise, does oil actually spike, when a hotspot event happens? The Geopolitical Feed page only lines events and oil up on a shared date axis so the two can be compared by eye; a real analysis needs more history to accumulate first, same as the other two feeds.
 
 ## 📈 Power BI
 
-[`connections_relationships_between_commodity_and_live_commodity.pbix`](connections_relationships_between_commodity_and_live_commodity.pbix) is a ready-made Power BI report connecting `live_prices.db` (via ODBC) and `commodity_prices.csv` (natively). Open it in Power BI Desktop; since it reads local files, refreshing after a tracker update is `git pull` then Refresh — the committed `.pbix` itself doesn't auto-update just because the underlying data changed on GitHub. Worth remembering, since it's the one manual step in an otherwise self-running pipeline.
+The dashboard is a Power BI project (PBIP) in [`powerbi/`](powerbi/): open [`powerbi/connections_relationships_between_commodity_and_live_commodity.pbip`](powerbi/connections_relationships_between_commodity_and_live_commodity.pbip) in Power BI Desktop. It reads the local copies of the data, so refreshing after a tracker update is `git pull`, then Refresh. The committed report does not update itself when the data changes on GitHub, which is the one manual step in an otherwise self-running pipeline.
 
-`conflict_events.db` isn't wired into the `.pbix` yet. When it is, add it as a second ODBC DSN (same driver as `live_prices.db`) and use Power BI's Map/bubble-map visual with `lat`/`long` as location, event count or `SUM(ABS(goldstein_scale))` as size, and `hotspot_region` as color/legend.
+**One-time setup on a new machine**
+1. Install a 64-bit SQLite ODBC driver and create two **User DSNs** with these exact names: `tracking_metals_live` pointing at `live_prices.db`, and `conflict_events_live` pointing at `conflict_events.db`.
+2. The `commodity_prices` and `headline_log` queries read `commodity_prices.csv` from an absolute path. Change the `File.Contents(...)` path in both to your clone (Transform data, then Advanced Editor).
+3. Refresh.
+
+The original single-page `.pbix` from the first version of this project is still in the repo root for reference; the `.pbip` above replaces it.
 
 ## 🔮 Gold Price Forecasting (v1)
 
